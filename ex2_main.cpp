@@ -1,94 +1,112 @@
 // ex2_main.cpp
 #include <iostream>
-#include <string>
-#include<string.h>
 #include<vector>
-namespace cpp2 {
-	/* --------------------------------------------------------------------- */
-	/*
-	mcxi
-	mcxi 記法を解析するクラスです。
-	*/
-	/* --------------------------------------------------------------------- */
-	class mcxi {
-	public:
-		int num;
-		mcxi(std::string);
-		std::string to_string();
-	};
-	mcxi::mcxi(std::string s) {
-		for (unsigned int i = 0; i < s.length() - 1; i++) {
-			if ('0' <= s[i] && s[i] <= '9') {
-				num += int(s[i] - '0');
-				std::cout << s[i] << "aa" << num << std::endl;
-			}
-			else {
-				if (num == 0) { num++; }
-				switch (s[i])
-				{
-				case 'm':
-					num *= 1000;
-				case 'c':
-					num *= 100;
-				case 'x':
-					num *= 10;
-				case 'i':
-					num *= 1;
-				}
-			}
-		}std::cout << "sna" << num << std::endl;
+using namespace std;
+#define CPP2_PRIME_UPPER_LIMIT 1000000 //探索する値の上限値。
+
+/* --------------------------------------------------------------- */
+/*
+* gcd
+*
+* 与えられた正整数 a と dに対して、最大公約数を返す
+*
+*/
+/* -------------------------------------------------------------- */
+int gcd(int a, int b)
+{
+	if (a%b == 0)
+	{
+		return(b);
+	}else{
+		return(gcd(b, a%b));
+	}
+}
+/* --------------------------------------------------------------- */
+/*
+* is_prime
+*
+* 与えられた正整数 x に対して、素数かどうかを判定する
+*
+*/
+/* -------------------------------------------------------------- */
+bool is_prime(unsigned int x) {
+	int flag = 0;
+	if (x < 2) {
+		return false;
+	}
+	else if (x == 2) {
+		return true;
+	}
+	else if (x % 2 == 0) {
+		return false;
 	}
 
-	std::string mcxi::to_string() {
-		std::string str;
-		return("m");
+	double sqx = sqrt(x);
+	for (int i = 3; i <= sqx; i += 2) {
+		if (x%i == 0) {
+			return false;
+		}
 	}
-
-	mcxi operator+  (mcxi a, mcxi b) {
-		mcxi temp("55");
-		return temp;
+	return true;
+}
+/* --------------------------------------------------------------- */
+/*
+* nth_prime
+*
+* 与えられた正整数 a と d と n に対して、この等差数列に含まれる n 番目の素数を返す。
+* 適切な入力でない場合は-1を返す。
+*
+*/
+/* -------------------------------------------------------------- */
+int nth_prime(unsigned int a, unsigned int d, unsigned int n) {
+	if (a == 0 || d== 0 || n == 0) {
+		return -1;
 	}
+	if (a > 65535 || d > 65535 || n > 65535) {
+		return -1;
+	}
+	if (!(gcd(a,d) == 1)) {
+		return -1;
+	}
+	int num = a;
+	int count = 0;//numが素数であれば1インクリメントする。
+	while (num < 1000000) {
+		if (is_prime(num) == true) {
+			count++;
+		}
+		if (count == n) {
+			return num;
+		}
+		num += d;
+	}
+}
 
-} // namespace cpp2
 int main() {
-	cpp2::mcxi a0("xi");
-	cpp2::mcxi b0("x9i");
-	cpp2::mcxi result0 = a0 + b0;
-	std::cout << "3x" << " " << result0.to_string() << std::endl;
-	cpp2::mcxi a1("i");
-	cpp2::mcxi b1("9i");
-	cpp2::mcxi result1 = a1 + b1;
-	std::cout << "x" << " " << result1.to_string() << std::endl;
-	cpp2::mcxi a2("c2x2i");
-	cpp2::mcxi b2("4c8x8i");
-	cpp2::mcxi result2 = a2 + b2;
-	std::cout << "6cx" << " " << result2.to_string() << std::endl;
-	cpp2::mcxi a3("m2ci");
-	cpp2::mcxi b3("4m7c9x8i");
-	cpp2::mcxi result3 = a3 + b3;
-	std::cout << "5m9c9x9i" << " " << result3.to_string() << std::endl;
-	cpp2::mcxi a4("9c9x9i");
-	cpp2::mcxi b4("i");
-	cpp2::mcxi result4 = a4 + b4;
-	std::cout << "m" << " " << result4.to_string() << std::endl;
-	cpp2::mcxi a5("i");
-	cpp2::mcxi b5("9m9c9x8i");
-	cpp2::mcxi result5 = a5 + b5;
-	std::cout << "9m9c9x9i" << " " << result5.to_string() << std::endl;
-	cpp2::mcxi a6("m");
-	cpp2::mcxi b6("i");
-	cpp2::mcxi result6 = a6 + b6;
-	std::cout << "mi" << " " << result6.to_string() << std::endl;
-	cpp2::mcxi a7("i");
-	cpp2::mcxi b7("m");
-	cpp2::mcxi result7 = a7 + b7;
-	std::cout << "mi" << " " << result7.to_string() << std::endl;
-	cpp2::mcxi a8("m9i");
-	cpp2::mcxi b8("i");
-	cpp2::mcxi result8 = a8 + b8;
-	std::cout << "mx" << " " << result8.to_string() << std::endl;
-	cpp2::mcxi a9("9m8c7xi");
-	cpp2::mcxi b9("c2x8i");
-	cpp2::mcxi result9 = a9 + b9;
-	std::cout << "9m9c9x9i" << " " << result9.to_string() << std::endl;
+	std::cout << nth_prime(367, 186, 151) << std::endl;
+	std::cout << nth_prime(179, 10, 203) << std::endl;
+	std::cout << nth_prime(271, 37, 39) << std::endl;
+	std::cout << nth_prime(103, 230, 1) << std::endl;
+	std::cout << nth_prime(27, 104, 185) << std::endl;
+	std::cout << nth_prime(253, 50, 85) << std::endl;
+	std::cout << nth_prime(1, 1, 1) << std::endl;
+	std::cout << nth_prime(9075, 337, 210) << std::endl;
+	std::cout << nth_prime(307, 24, 79) << std::endl;
+	std::cout << nth_prime(331, 221, 177) << std::endl;
+	std::cout << nth_prime(259, 170, 40) << std::endl;
+	std::cout << nth_prime(269, 58, 102) << std::endl;
+	// 以下、同様に、入出力例通りになるか確認せよ。
+
+	//適切な入力出ない場合
+	std::cout << nth_prime(-367, 186, 151) << std::endl;
+	std::cout << nth_prime(367, -186, 151) << std::endl;
+	std::cout << nth_prime(367, 186, -151) << std::endl;
+	//入力値にマイナスがついている
+	std::cout << nth_prime(0, 10, 203) << std::endl;
+	std::cout << nth_prime(17, 0, 203) << std::endl;
+	std::cout << nth_prime(17, 10, 0) << std::endl;
+	//入力値に0が入っている
+	std::cout << nth_prime(2, 222, 39) << std::endl;
+	//aとdが互いに素でない
+        cin.get();
+        return 0;
 }
